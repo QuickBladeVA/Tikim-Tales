@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public class CookingMinigames : MonoBehaviour
 {
     public List <Slider> objects;
-    public Transform pos;
+    public Transform posPanel;
 
     public Button bttnFirst;
     public Button bttnSecond;
@@ -56,6 +56,21 @@ public class CookingMinigames : MonoBehaviour
             meter.maxValue = capacity;
             meter.minValue = 0;
         }
+        if (minigame == Minigame.Chop)
+        {
+            objects = new List<Slider>();
+            int childCount = posPanel.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                Transform child = posPanel.GetChild(i);
+                Slider slider = child.GetComponent<Slider>();
+                if (slider != null)
+                {
+                    objects.Add(slider);
+                }
+            }
+        }
+
     }
 
     public void Update()
