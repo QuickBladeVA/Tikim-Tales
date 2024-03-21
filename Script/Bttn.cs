@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using static Bttn;
 
 public class Bttn : MonoBehaviour
 {
@@ -10,6 +12,12 @@ public class Bttn : MonoBehaviour
     public int sceneNumber;
     public string specificScene;
     public GameObject nextObj;
+
+    public bool isNavigation;
+    public enum Look { Up, Down, Left, Right }
+    public Look direction;
+
+
     public void ResetLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -53,6 +61,28 @@ public class Bttn : MonoBehaviour
         else
         {
             nextObj.SetActive(true);
+        }
+    }
+
+    public void NaviBttn()
+    {
+        if (isNavigation)
+        {
+            switch (direction)
+            {
+                case Look.Up:
+                    GameManager.Instance.vertical--;
+                    break;
+                case Look.Down:
+                    GameManager.Instance.vertical++;
+                    break;
+                case Look.Left:
+                    GameManager.Instance.horizontal--;
+                    break;
+                case Look.Right:
+                    GameManager.Instance.horizontal++;
+                    break;
+            }
         }
     }
 }
