@@ -3,20 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static Bttn;
 
 public class Bttn : MonoBehaviour
 {
+    [Header("Object/s")]
     public List<GameObject> obj;
-    public int currentIndex = 0;
+
+    //public int currentIndex = 0;
+    //public GameObject nextObj;
+    [Header("Load Scenes")]
     public int sceneNumber;
     public string specificScene;
-    public GameObject nextObj;
 
+    [Header("Camera")]
     public bool isNavigation;
-    public enum Look { Up, Down, Left, Right }
     public Look direction;
 
+    [Header("Ingredient to put in inventory")]
+    public Ingredient ingredient;
+    [Header("left and right hand inventory")]
+    public Holding inv;
+    [Header("Requirement ingredient to open the mini games")]
+    public List<Ingredient> neededItem;
 
     public void ResetLevel()
     {
@@ -33,37 +41,57 @@ public class Bttn : MonoBehaviour
         Application.Quit();
     }
 
+    //turns on gameobjects in list and has index for specific obj
+    //ref to the obj list
     public void TurnOn(int select)
     {
         obj[select].SetActive(true);
     }
-
+    //turns off gameobjects in list and has index for specific obj
+    //ref to the obj list
     public void TurnOff(int select)
     {
         obj[select].SetActive(false);
     }
 
-    public void LoadSceneNumber() 
+    public void LoadSceneNumber() //Load scent using int
     {
         SceneManager.LoadScene(sceneNumber);
     }
-    public void LoadSpecificScene()
+    public void LoadSpecificScene()//Load scent using string
     {
         SceneManager.LoadScene(specificScene);
     }
-    public void MultipleObj()
+
+    //to future me from past me:  use for multiple obj like visual novel
+    //public void MultipleObj()
+    //{
+    //    if (currentIndex < obj.Count)
+    //    {
+    //        obj[currentIndex].SetActive(true);
+    //        currentIndex++;
+    //        obj[currentIndex-1].SetActive(false);
+    //    }
+    //    else
+    //    {
+    //        nextObj.SetActive(true);
+    //    }
+    //}
+
+    //gameplay: add ingredient to the inventory in gameManager
+    public void IngredientButton() 
     {
-        if (currentIndex < obj.Count)
+        if (GameManager.Instance.ingredients.Count < 2)
         {
-            obj[currentIndex].SetActive(true);
-            currentIndex++;
-        }
-        else
-        {
-            nextObj.SetActive(true);
+            GameManager.Instance.ingredients.Add(ingredient);
         }
     }
-
+    //gameplay: sets right / left in inventory holding enum
+    public void InvButton()
+    {
+        GameManager.Instance.inv = inv;
+    }
+    //gameplay: Navigation cam dont touch unless me
     public void NaviBttn()
     {
         if (isNavigation)
@@ -85,4 +113,5 @@ public class Bttn : MonoBehaviour
             }
         }
     }
+
 }
