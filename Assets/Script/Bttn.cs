@@ -8,7 +8,7 @@ public class Bttn : MonoBehaviour
 {
     [Header("Object/s")]
     public List<GameObject> obj;
-
+    public Transform pos;
     //public int currentIndex = 0;
     //public GameObject nextObj;
     [Header("Load Scenes")]
@@ -25,6 +25,8 @@ public class Bttn : MonoBehaviour
     public Holding inv;
     [Header("Requirement ingredient to open the mini games")]
     public List<Ingredient> neededItem;
+
+
 
     public void ResetLevel()
     {
@@ -54,6 +56,11 @@ public class Bttn : MonoBehaviour
         obj[select].SetActive(false);
     }
 
+    public void Spawn(int select) 
+    {
+        Instantiate(obj[select], pos.transform);
+    }
+
     public void LoadSceneNumber() //Load scent using int
     {
         SceneManager.LoadScene(sceneNumber);
@@ -81,12 +88,61 @@ public class Bttn : MonoBehaviour
     //gameplay: add ingredient to the inventory in gameManager
     public void IngredientButton() 
     {
-        if (GameManager.Instance.ingredients.Count < 2)
+        if (ingredient != Ingredient.Trash)
         {
-            GameManager.Instance.ingredients.Add(ingredient);
+            if (GameManager.Instance.ingredients.Count < 2)
+            {
+                GameManager.Instance.ingredients.Add(ingredient);
+            }
+        }
+        else 
+        {
+            if (GameManager.Instance.ingredients.Count > 0)
+            {
+
+                    GameManager.Instance.ingredients.RemoveAt(GameManager.Instance.selected);
+                 
+            }
         }
     }
+
+    public void Serve()
+    {
+        List<string> listDelete = new List<string>();
+        int total= GameManager.Instance.recipeList.Count;
+        
+        foreach(string item in GameManager.Instance.recipeList)
+        {
+            if (GameManager.Instance.preparedIngredients.Contains(item))
+            {
+                GameManager.Instance.preparedIngredients.Remove(item);
+                listDelete.Add(item);
+            }
+        }
+        foreach(string item in listDelete)
+        {
+        GameManager.Instance.recipeList.Remove(item);
+        }
+
+
+        int mistakes= GameManager.Instance.preparedIngredients.Count + GameManager.Instance.recipeList.Count;
+        GameManager.Instance.score= GameManager.Instance.score - (mistakes*100/total);
+        GameManager.Instance.isGameOver= true;
+
+
+    }
     //gameplay: sets right / left in inventory holding enum
+    public void DeleteItem() 
+    {
+        if (GameManager.Instance.preparedIngredients.Count == 1)
+        {
+            GameManager.Instance.preparedIngredients.RemoveAt(0);
+        }
+        if (GameManager.Instance.preparedIngredients.Count >= 1)
+        {
+            GameManager.Instance.preparedIngredients.RemoveAt(GameManager.Instance.preparedIngredients.Count - 1);
+        }
+    }
     public void InvButton()
     {
         GameManager.Instance.inv = inv;

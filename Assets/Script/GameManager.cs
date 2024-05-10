@@ -1,16 +1,31 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class GameManager : MonoBehaviour
 {
     //Technical/Other Stuff
     public static GameManager Instance;
 
+    public List<GameObject> InvPanel;
+    public List<TextMeshProUGUI> InvText;
+
     [Header("Inventory")]
     public List<Ingredient> ingredients;
     public Holding inv = Holding.Left;
     public int selected;
+
+    [Header("Recipe")]
+    public List<string> preparedIngredients;
+    public List<string> recipeList;
+    public Transform phone;
+    public Transform dish;
+
+    public GameObject phoneText;
+    public GameObject dishText;
 
     [Header("Camera stuff")]
 
@@ -28,6 +43,11 @@ public class GameManager : MonoBehaviour
     public List<Button> navButtons;
     public List <GameObject> panels;
 
+    public int score = 100;
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI commentText;
+
+    public bool isGameOver;
 
     //Gameplay stuff
     void Start()
@@ -40,18 +60,52 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this.gameObject); 
         }
+    
+        foreach(string ingredient in recipeList)
+        {
+        Instantiate(phoneText,phone.transform);
+        TextMeshProUGUI tmp= phoneText.GetComponent<TextMeshProUGUI>(); 
+        tmp.text= "- " + ingredient.ToString();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        InvHold();
-        Pause(); 
-        if (pausedPanel.active == false)
+        if (isGameOver)
         {
-            Navigation(); 
+            DishScore();
         }
-        NavRotate(); 
+        if (!isGameOver)
+        {
+            foreach (Transform child in dish)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (string ingredient in preparedIngredients)
+            {
+                Instantiate(dishText, dish.transform);
+                TextMeshProUGUI tmp = dishText.GetComponent<TextMeshProUGUI>();
+                
+                tmp.text = "- " + ingredient.ToString();
+
+            }
+
+            Inventory();
+
+            Pause();
+            if (pausedPanel.active == false)
+            {
+                Navigation();
+            }
+            NavRotate();
+        }
+    }
+
+    public void RemoveItem(string item) 
+    {
+        preparedIngredients.Remove(item);
     }
 
     // Pauses or resumes the game based on user input
@@ -202,6 +256,77 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+    public void DishScore()
+    {
 
+        scoreText.text="Score: "+score;
+        if (score>=100)
+        {
+            commentText.text="The Taste of Heaven";
+        }
+        else if (85<=score && score<=99)
+        {
+            commentText.text="You did a great job!";
+        }
+        else if (75<=score && score<=84)
+        {
+            commentText.text="The dish was 'Satisfactory'";
+        }
+        else if (50<=score && score<=74)
+        {
+            commentText.text="Nice Try";
+        }        
+        else if (25<=score && score<=49)
+        {
+            commentText.text="You should have used AjinoTomo";
+        }
+         else if (1<=score && score<=24)
+        {
+            commentText.text="Didn't you mother taught you how to cook";
+        }  
+        else if (0==score)
+        {
+            commentText.text="You didn't even try...";
+        }      
+        else if (-10<=score && score<=-1)
+        {
+            commentText.text="WHAT DID YOU EVEN PUT IN THIS!!!";
+        }
+        else if (score<-10)
+        {
+            commentText.text="*Lola Leah Dies...*";
+        
+        }
+        if (score >= 75) 
+        {
+            PlayerPrefs.SetInt("Level", SceneManager.GetActiveScene().buildIndex+1);
+        }
+    }
+
+    public void Inventory()
+    {
+        if (ingredients.Count == 1) 
+        {
+            inv = Holding.Left;
+        }
+
+        InvHold();
+
+        if (ingredients.Count == 0)
+        {
+            InvText[0].text = "";
+        }
+
+        if (ingredients.Count == 1)
+        {
+            InvText[0].text = ingredients[0].ToString();
+            InvText[1].text = "";
+        }
+        if (ingredients.Count == 2)
+        {
+            InvText[1].text = ingredients[1].ToString();
+        }
+
+    }
 
 }

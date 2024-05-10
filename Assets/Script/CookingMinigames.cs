@@ -3,6 +3,7 @@ using TMPro; // TextMeshPro for UI text
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEditor.PlayerSettings;
 
 public class CookingMinigames : MonoBehaviour
 {
@@ -10,15 +11,21 @@ public class CookingMinigames : MonoBehaviour
     public List<Slider> objects; // List of sliders for the Chop minigame
     public Transform posPanel; // Panel holding the sliders
 
+
     public Button bttnFirst; // First button for the minigame
     public Button bttnSecond; // Second button for the minigame
+
+    [Tooltip("Used In Every miniGame")]
     public GameObject gamePanel; // Panel for the minigame
     public Slider meter; // Slider representing the current value
 
     public TextMeshProUGUI capText; // Text for displaying capacity
     public TextMeshProUGUI currentText; // Text for displaying current value
     public TextMeshProUGUI targetText; // Text for displaying target value range
+    [Tooltip("Used In Every miniGame")]
     public TextMeshProUGUI commentText; // Text for displaying comments
+
+
 
     // Minigame parameters
     public float capacity; // Maximum capacity
@@ -26,19 +33,38 @@ public class CookingMinigames : MonoBehaviour
     public float targetMin; // Minimum target value
     public float targetMax; // Maximum target value
 
+
+    [Header("Stirring")]
+    public Vector2 mousePos;
+    public float objPosX;
+    public float objPosY;
+
+    [Header("Progress checker")]
+    public int position = 1;
+    public int previous = 1;
+    public bool clockwise = false;
+
+    [Header("Objective")]
+    [Tooltip("True = Clockwise \nFalse = CounterClockwise")]
+    public bool rotationObjective_Clockwise = false;
+
     private float gameTimer; // Timer for minigame
-    private float delayTimer = 3f; // Timer for delaying task completion
+    private float delayTimer = 0.5f; // Timer for delaying task completion
     private float progress = 0.0f; // Progress percentage
     public bool isComplete = false; // Flag indicating if the minigame is complete
+    public Progressing progressing;
 
     public Minigame minigame; // Current minigame type
 
     public bool isPressed; // Flag indicating if a button is pressed
 
+    public Slider progressSlider;
+
 
 
     public void Start()
-    {
+    {    
+        Randomizer();
         GameManager.Instance.isInGame=true;
         switch (minigame)
         {
@@ -77,37 +103,51 @@ public class CookingMinigames : MonoBehaviour
 
     public void Update()
     {
-        // Update behavior based on the current minigame
-        switch (minigame)
+        if (!GameManager.Instance.isGameOver)
         {
-            case Minigame.Pour:
+            // Update behavior based on the current minigame
+            switch (minigame)
+            {
+                case Minigame.Pour:
 
-                if (isPressed)
-                {
-                    AddCurrent();
-                }
-                Cap();
-                break;
-            case Minigame.Cook:
-                ReduceCurrent();
-                Progress();
-                break;
-            case Minigame.Chop:
-                MultipleItems(objects);
-                break;
-        }
-        // Update UI elements for certain minigames
-        if (minigame == Minigame.Cook || minigame == Minigame.Pour)
-        {
-            meter.value = current;
-            capText.text = "Max Capacity: " + capacity;
-            currentText.text = "Current Value: " + current;
-            targetText.text = "Target Value: " + targetMin + "-" + targetMax;
-        }
-        // Handle task completion
-        if (isComplete)
-        {
-            TaskComplete();
+                    if (isPressed)
+                    {
+                        AddCurrent();
+                    }
+                    Cap();
+                    break;
+                case Minigame.Cook:
+                    ReduceCurrent();
+                    if (current >= targetMin && current <= targetMax)
+                    {
+                        progressing = Progressing.Add;
+                    }
+                    else
+                    {
+                        progressing = Progressing.Reduce;
+                    }
+                    Progress(100);
+                    break;
+                case Minigame.Chop:
+                    MultipleItems(objects);
+                    break;
+                case Minigame.Stir:
+                    Rotation();
+                    break;
+            }
+            // Update UI elements for certain minigames
+            if (minigame == Minigame.Cook || minigame == Minigame.Pour)
+            {
+                meter.value = current;
+                capText.text = "Max Capacity: " + capacity;
+                currentText.text = "Current Value: " + current;
+                targetText.text = "Target Value: " + targetMin + "-" + targetMax;
+            }
+            // Handle task completion
+            if (isComplete)
+            {
+                TaskComplete();
+            }
         }
     }
 
@@ -115,6 +155,7 @@ public class CookingMinigames : MonoBehaviour
     public void AddCurrent()
     {
         current = Mathf.Clamp(current + 0.1f, 0, capacity);
+        current = Mathf.Round(current*100f)/100f;
     }
 
     // Method for reducing the current value (used in the Cook minigame)
@@ -128,6 +169,7 @@ public class CookingMinigames : MonoBehaviour
             gameTimer = 0.05f; // Reset the countdown timer
         }
     }
+
 
     // Method for checking if current value exceeds capacity
     public void Cap()
@@ -154,36 +196,28 @@ public class CookingMinigames : MonoBehaviour
     }
 
     // Method for simulating progress in the Cook minigame
-    public void Progress()
+    public void Progress(int max)
     {
-        if (progress >= 100)
+        progressSlider.maxValue = max;
+        if (progress >= max)
         {
             isComplete = true; // Set completion flag to true
-            commentText.text = "Done";
         }
         if (!isComplete)
         {
-            if (current >= targetMin && current <= targetMax)
+            if (progressing == Progressing.Add)
             {
-                gameTimer -= Time.deltaTime; // Decrease the countdown timer
-
-                if (gameTimer <= 0f) // If the countdown reaches zero
-                {
-                    progress = Mathf.Clamp(progress + 1, 0, 100); // Increment progress
-                    gameTimer = 0.05f; // Reset the countdown timer
-                }
+                ProgressBar(1);
             }
-            else
+            else if (progressing == Progressing.Reduce)
             {
-                gameTimer -= Time.deltaTime; // Decrease the countdown timer
-
-                if (gameTimer <= 0f) // If the countdown reaches zero
-                {
-                    progress = Mathf.Clamp(progress - 1, 0, 100); // Decrement progress
-                    gameTimer = 0.05f; // Reset the countdown timer
-                }
+                ProgressBar(-1);
             }
-            commentText.text = progress.ToString() + "/100"; // Update progress text
+            else if (progressing == Progressing.None)
+            {
+                ProgressBar(0);
+            }
+            progressSlider.value = progress; // Update progress text
         }
     }
 
@@ -195,8 +229,33 @@ public class CookingMinigames : MonoBehaviour
         if (delayTimer <= 0f) // If the countdown reaches zero
         {
             GameManager.Instance.isInGame = false;
+
+            switch (minigame) 
+            {
+                case Minigame.Cook:
+                    GameManager.Instance.preparedIngredients.Add("Cooked " + GameManager.Instance.ingredients[GameManager.Instance.selected].ToString());
+                    Instantiate(GameManager.Instance.dishText,GameManager.Instance.dish.transform);
+                    break;
+                case Minigame.Pour:
+                    GameManager.Instance.preparedIngredients.Add("Poured "+GameManager.Instance.ingredients[GameManager.Instance.selected].ToString());
+                    Instantiate(GameManager.Instance.dishText, GameManager.Instance.dish.transform);
+                    break;
+                case Minigame.Stir:
+                    GameManager.Instance.preparedIngredients.Add("Stirred " + GameManager.Instance.ingredients[GameManager.Instance.selected].ToString());
+                    Instantiate(GameManager.Instance.dishText, GameManager.Instance.dish.transform);
+                    break;
+                case Minigame.Chop:
+                    GameManager.Instance.preparedIngredients.Add("Chopped " + GameManager.Instance.ingredients[GameManager.Instance.selected].ToString());
+                    Instantiate(GameManager.Instance.dishText, GameManager.Instance.dish.transform);
+                    break;
+            }
+
+
+            
+            GameManager.Instance.ingredients.RemoveAt(GameManager.Instance.selected);
             gamePanel.SetActive(false); // Deactivate the game panel
             delayTimer = 5f; // Reset the countdown timer
+            Destroy(this.gameObject);
         }
     }
 
@@ -244,6 +303,85 @@ public class CookingMinigames : MonoBehaviour
         }
 
 
+    }
+    public void Spin(int pos, int prev, int next)
+    {
+        position = pos;
+        if (previous == prev)
+        {
+            progressing = Progressing.Add;
+            Progress((int)targetMax);
+        }
+        else if (previous == next)
+        {
+            progressing = Progressing.None;
+            Progress((int)targetMax);
+        }
+        previous = pos;
+    }
+
+    public void Rotation()
+    {
+        ////Rotate
+        mousePos = Input.mousePosition;//gets mouse postion
+
+        //mouse position relative to the gameobject (...this script is attached to.)
+        objPosX = mousePos.x - transform.position.x;
+        objPosY = mousePos.y - transform.position.y;
+
+        if (Input.GetMouseButton(0))
+        {
+            Vector2 direction = new Vector2(objPosX, objPosY);
+            posPanel.up = direction;
+            if (objPosX <= 0 && objPosY > 0)
+            {
+                Spin(1, 4, 2);
+            }
+            else if (objPosX <= 0 && objPosY <= 0)
+            {
+                Spin(2, 1, 3);
+            }
+            else if (objPosX > 0 && objPosY <= 0)
+            {
+                Spin(3, 2, 4);
+
+            }
+            else if (objPosX > 0 && objPosY > 0)
+            {
+                Spin(4, 3, 1);
+
+            }
+        }
+    }
+
+    public void ProgressBar(int value)
+    {
+        gameTimer -= Time.deltaTime; // Decrease the countdown timer
+
+        if (gameTimer <= 0f) // If the countdown reaches zero
+        {
+            progress = Mathf.Clamp(progress + value, 0, 100); // Increment progress
+            gameTimer = 0.05f; // Reset the countdown timer
+        }
+    }
+
+    public void Randomizer() 
+    {
+        float random = Random.RandomRange(5f, 9f);
+        switch (minigame)
+        {
+            case Minigame.Pour:
+                targetMax = random * 10f;
+                targetMin = (random - Random.RandomRange(0.2f, 0.5f)) * 10f;
+                break;
+            case Minigame.Cook:
+                targetMax = random * 0.1f;
+                targetMin = (random - Random.RandomRange(1f, 2f)) * 0.1f;
+                break;
+            case Minigame.Stir:
+                targetMax = random - 2;
+                break;
+        }
     }
 
 }

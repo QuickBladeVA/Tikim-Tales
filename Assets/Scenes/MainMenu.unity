@@ -270,10 +270,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obj: []
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: Scene 1
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &257007920
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,10 +426,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obj:
   - {fileID: 2141573998}
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &339235177
 GameObject:
   m_ObjectHideFlags: 0
@@ -725,10 +733,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obj: []
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 3
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &447293872
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,10 +968,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obj:
   - {fileID: 2141573998}
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &538891507
 GameObject:
   m_ObjectHideFlags: 0
@@ -1608,10 +1624,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obj: []
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1788,7 +1808,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1158834573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2111,10 +2131,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   obj: []
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 2
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &1538482494
 GameObject:
   m_ObjectHideFlags: 0
@@ -2263,10 +2287,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obj:
   - {fileID: 447293872}
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &1560962245
 GameObject:
   m_ObjectHideFlags: 0
@@ -2863,10 +2891,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obj:
   - {fileID: 447293872}
-  currentIndex: 0
+  pos: {fileID: 0}
   sceneNumber: 0
   specificScene: 
-  nextObj: {fileID: 0}
+  isNavigation: 0
+  direction: 0
+  ingredient: 0
+  inv: 0
+  neededItem: 
 --- !u!1 &2090452876
 GameObject:
   m_ObjectHideFlags: 0

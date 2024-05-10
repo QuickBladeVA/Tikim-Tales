@@ -8,24 +8,27 @@ public class MinigameToggle : MonoBehaviour
 
     private void Update()
     {
-        foreach (GameObject obj in Button)
-        {
-            obj.SetActive(false);
-        }
-
-        foreach (GameObject obj in Button)
-        {
-            Bttn bttn = obj.GetComponent<Bttn>();
-            List<Ingredient> neededItem = bttn.neededItem;
-            if (GameManager.Instance.ingredients.Count > 0)
+        if (!GameManager.Instance.isGameOver)
+        { 
+            foreach (GameObject obj in Button)
             {
-                foreach (Ingredient item in neededItem)
-                {
-                    if (GameManager.Instance.ingredients[GameManager.Instance.selected] == item)
-                    {
-                        obj.SetActive(true);
-                    }
+                obj.SetActive(false);
+            }
 
+            foreach (GameObject obj in Button)
+            {
+                Bttn bttn = obj.GetComponent<Bttn>();
+                List<Ingredient> neededItem = bttn.neededItem;
+                if (GameManager.Instance.ingredients.Count > 0)
+                {
+                    foreach (Ingredient item in neededItem)
+                    {
+                        if (GameManager.Instance.ingredients[GameManager.Instance.selected] == item)
+                        {
+                            obj.SetActive(true);
+                        }
+
+                    }
                 }
             }
         }
