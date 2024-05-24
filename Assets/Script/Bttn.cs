@@ -143,6 +143,19 @@ public class Bttn : MonoBehaviour
             GameManager.Instance.preparedIngredients.RemoveAt(GameManager.Instance.preparedIngredients.Count - 1);
         }
     }
+    public void DestoyObject() 
+    {
+        foreach (GameObject item in obj) 
+        {
+            Destroy(item);
+        }
+        if (GameManager.Instance.isInGame) 
+        {
+            GameManager.Instance.isInGame = false;
+        }
+        
+
+    }
     public void InvButton()
     {
         GameManager.Instance.inv = inv;
@@ -150,7 +163,7 @@ public class Bttn : MonoBehaviour
     //gameplay: Navigation cam dont touch unless me
     public void NaviBttn()
     {
-        if (isNavigation)
+        if (isNavigation && GameManager.Instance.pausedPanel.active == false)
         {
             switch (direction)
             {

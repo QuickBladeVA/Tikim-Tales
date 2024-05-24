@@ -8,15 +8,17 @@ public class AudioSlider : MonoBehaviour
 
     private void Start()
     {
-        volumeSlider = this.GetComponent<Slider>();
+        volumeSlider = GetComponent<Slider>();
 
         // Initialize the slider value to the stored volume.
         volumeSlider.value = PlayerPrefs.GetFloat(VolumeKey, AudioListener.volume);
+
+        // Add listener for slider value changes
+        volumeSlider.onValueChanged.AddListener(delegate { OnSliderValueChanged(); });
     }
 
-    public void OnVolumeSliderChanged()
+    private void OnSliderValueChanged()
     {
-        // Update the global audio volume when the slider is adjusted.
         float volume = volumeSlider.value;
         AudioListener.volume = volume;
 

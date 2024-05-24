@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,7 +28,6 @@ public class GameManager : MonoBehaviour
 
     [Header("Camera stuff")]
 
-    public bool isPaused = false;
     public bool isRotating;
     public bool isInGame;
 
@@ -50,6 +48,11 @@ public class GameManager : MonoBehaviour
     public bool isGameOver;
 
     //Gameplay stuff
+
+    private void Awake()
+    {
+
+    }
     void Start()
     {
         if (Instance == null)
@@ -60,13 +63,14 @@ public class GameManager : MonoBehaviour
         {
             Destroy(this.gameObject); 
         }
-    
-        foreach(string ingredient in recipeList)
+
+        foreach (string text in recipeList)
         {
-        Instantiate(phoneText,phone.transform);
-        TextMeshProUGUI tmp= phoneText.GetComponent<TextMeshProUGUI>(); 
-        tmp.text= "- " + ingredient.ToString();
+            GameObject newText = Instantiate(phoneText, phone.transform);
+            TextMeshProUGUI tmp = newText.GetComponent<TextMeshProUGUI>();
+            tmp.text = "- " + text.ToString();
         }
+
     }
 
     // Update is called once per frame
@@ -83,12 +87,11 @@ public class GameManager : MonoBehaviour
                 Destroy(child.gameObject);
             }
 
-            foreach (string ingredient in preparedIngredients)
+            foreach (string item in preparedIngredients)
             {
-                Instantiate(dishText, dish.transform);
-                TextMeshProUGUI tmp = dishText.GetComponent<TextMeshProUGUI>();
-                
-                tmp.text = "- " + ingredient.ToString();
+                GameObject newText = Instantiate(dishText, dish.transform);
+                TextMeshProUGUI tmp = newText.GetComponent<TextMeshProUGUI>();
+                tmp.text = "- " + item.ToString();
 
             }
 
@@ -149,7 +152,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        if (!isInGame)
+        if (!isInGame && pausedPanel.active==false)
         {
             // Keybinds for navigation
             if (Input.GetKeyDown(KeyCode.W) && navButtons[0].interactable == true)

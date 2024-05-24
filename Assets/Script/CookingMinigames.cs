@@ -3,7 +3,6 @@ using TMPro; // TextMeshPro for UI text
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 
 public class CookingMinigames : MonoBehaviour
 {
@@ -17,7 +16,7 @@ public class CookingMinigames : MonoBehaviour
 
     [Tooltip("Used In Every miniGame")]
     public GameObject gamePanel; // Panel for the minigame
-    public Slider meter; // Slider representing the current value
+    public Image meter; // Slider representing the current value
 
     public TextMeshProUGUI capText; // Text for displaying capacity
     public TextMeshProUGUI currentText; // Text for displaying current value
@@ -38,6 +37,8 @@ public class CookingMinigames : MonoBehaviour
     public Vector2 mousePos;
     public float objPosX;
     public float objPosY;
+    public Image ladle;
+    public List<Sprite> ladleVariety;
 
     [Header("Progress checker")]
     public int position = 1;
@@ -61,6 +62,10 @@ public class CookingMinigames : MonoBehaviour
     public Slider progressSlider;
 
 
+    [Header("Images For Chopping")]
+    public Image chopOrig;
+    public List<Sprite> chopVariety;
+
 
     public void Start()
     {    
@@ -79,14 +84,71 @@ public class CookingMinigames : MonoBehaviour
         // Set up initial state for certain minigames
         if (minigame == Minigame.Cook || minigame == Minigame.Pour)
         {
+            /*
             meter.interactable = false; // Disable interaction with the meter slider
             meter.value = current; // Set initial value for the meter
             meter.maxValue = capacity; // Set maximum value for the meter
             meter.minValue = 0; // Set minimum value for the meter
+            */
+            float fillAmount = current / capacity;
+            meter.fillAmount = fillAmount;
         }
         if (minigame == Minigame.Chop)
         {
             // Initialize the list of sliders for the Chop minigame
+            if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Chicken)
+            {
+                chopOrig.sprite = chopVariety[0];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Cabbage)
+            {
+                chopOrig.sprite = chopVariety[1];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Cauliflower)
+            {
+                chopOrig.sprite = chopVariety[2];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.BellPepper)
+            {
+                chopOrig.sprite = chopVariety[3];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Carrot)
+            {
+                chopOrig.sprite = chopVariety[4];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Celery)
+            {
+                chopOrig.sprite = chopVariety[5];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Onion)
+            {
+                chopOrig.sprite = chopVariety[6];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Garlic)
+            {
+                chopOrig.sprite = chopVariety[7];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Corn)
+            {
+                chopOrig.sprite = chopVariety[8];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Eggplant)
+            {
+                chopOrig.sprite = chopVariety[9];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.StringBean)
+            {
+                chopOrig.sprite = chopVariety[10];
+            }
+            else if (GameManager.Instance.ingredients[GameManager.Instance.selected] == Ingredient.Pechay)
+            {
+                chopOrig.sprite = chopVariety[11];
+            }
+            else
+            {
+                chopOrig.sprite = chopOrig.sprite;
+            }
+
             objects = new List<Slider>();
             int childCount = posPanel.childCount;
             for (int i = 0; i < childCount; i++)
@@ -138,10 +200,14 @@ public class CookingMinigames : MonoBehaviour
             // Update UI elements for certain minigames
             if (minigame == Minigame.Cook || minigame == Minigame.Pour)
             {
-                meter.value = current;
-                capText.text = "Max Capacity: " + capacity;
-                currentText.text = "Current Value: " + current;
-                targetText.text = "Target Value: " + targetMin + "-" + targetMax;
+                //meter.value = current;
+
+                float fillAmount = current / capacity;
+                meter.fillAmount = fillAmount;
+
+                capText.text = "Max Capacity:\n" + capacity;
+                currentText.text = "Current Value:\n" + current;
+                targetText.text = "Target Value:\n" + targetMin + "-" + targetMax;
             }
             // Handle task completion
             if (isComplete)
@@ -166,6 +232,7 @@ public class CookingMinigames : MonoBehaviour
         if (gameTimer <= 0f) // If the countdown reaches zero
         {
             current = Mathf.Clamp(current - 0.01f, 0, capacity); // Reduce the current value
+            current = Mathf.Round(current * 100f) / 100f;
             gameTimer = 0.05f; // Reset the countdown timer
         }
     }
@@ -326,30 +393,37 @@ public class CookingMinigames : MonoBehaviour
         mousePos = Input.mousePosition;//gets mouse postion
 
         //mouse position relative to the gameobject (...this script is attached to.)
-        objPosX = mousePos.x - transform.position.x;
-        objPosY = mousePos.y - transform.position.y;
+        objPosX = mousePos.x - posPanel.transform.position.x;
+        objPosY = mousePos.y - posPanel.transform.position.y;
 
-        if (Input.GetMouseButton(0))
+        if (objPosX < 150 && objPosX > -150 && objPosY < 150 && objPosY > -150) 
         {
-            Vector2 direction = new Vector2(objPosX, objPosY);
-            posPanel.up = direction;
-            if (objPosX <= 0 && objPosY > 0)
+            if (Input.GetMouseButton(0))
             {
-                Spin(1, 4, 2);
-            }
-            else if (objPosX <= 0 && objPosY <= 0)
-            {
-                Spin(2, 1, 3);
-            }
-            else if (objPosX > 0 && objPosY <= 0)
-            {
-                Spin(3, 2, 4);
+                Vector2 direction = new Vector2(objPosX, objPosY);
+                posPanel.up = direction;
+                if (objPosX <= 0 && objPosY > 0)
+                {
+                    Spin(1, 4, 2);
+                    ladle.sprite = ladleVariety[2];
+                }
+                else if (objPosX <= 0 && objPosY <= 0)
+                {
+                    Spin(2, 1, 3);
+                    ladle.sprite = ladleVariety[3];
+                }
+                else if (objPosX > 0 && objPosY <= 0)
+                {
+                    Spin(3, 2, 4);
+                    ladle.sprite = ladleVariety[0];
 
-            }
-            else if (objPosX > 0 && objPosY > 0)
-            {
-                Spin(4, 3, 1);
+                }
+                else if (objPosX > 0 && objPosY > 0)
+                {
+                    Spin(4, 3, 1);
+                    ladle.sprite = ladleVariety[1];
 
+                }
             }
         }
     }
@@ -367,16 +441,20 @@ public class CookingMinigames : MonoBehaviour
 
     public void Randomizer() 
     {
-        float random = Random.RandomRange(5f, 9f);
+        float random = Random.Range(5f, 9f);
         switch (minigame)
         {
             case Minigame.Pour:
                 targetMax = random * 10f;
-                targetMin = (random - Random.RandomRange(0.2f, 0.5f)) * 10f;
+                targetMin = (random - Random.Range(0.2f, 0.5f)) * 10f;
+                targetMax = Mathf.Round(targetMax * 100f) / 100f;
+                targetMin = Mathf.Round(targetMin * 100f) / 100f;
                 break;
             case Minigame.Cook:
                 targetMax = random * 0.1f;
-                targetMin = (random - Random.RandomRange(1f, 2f)) * 0.1f;
+                targetMin = (random - Random.Range(1f, 2f)) * 0.1f;
+                targetMax = Mathf.Round(targetMax * 100f) / 100f;
+                targetMin = Mathf.Round(targetMin * 100f) / 100f;
                 break;
             case Minigame.Stir:
                 targetMax = random - 2;
